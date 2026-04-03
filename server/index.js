@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/cards', require('./routes/cardRoutes'));
+app.use('/api/matches', require('./routes/matchRoutes'));
 
 // 测试路由
 app.get('/', (req, res) => {

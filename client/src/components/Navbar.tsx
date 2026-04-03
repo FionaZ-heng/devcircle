@@ -16,6 +16,7 @@ export default function Navbar() {
       <div className="flex gap-4 items-center">
         {user ? (
           <>
+            <Link to="/matches" className="text-gray-600 hover:text-blue-500 text-sm">Matches</Link>
             <Link to="/create" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-semibold">
               + Post Card
             </Link>
