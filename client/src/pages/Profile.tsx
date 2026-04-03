@@ -81,7 +81,7 @@ function TagInput({
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>()
-  const { user: me, setUser } = useAuthStore()
+  const { user: me } = useAuthStore()
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -120,10 +120,14 @@ export default function Profile() {
     setSaving(true)
     setError('')
     try {
-      const res = await api.put('/users/me', { bio, skillsOffered, skillsWanted })
-      const updated = res.data as ProfileData
-      setProfile(prev => prev ? { ...prev, bio: updated.bio, skillsOffered: updated.skillsOffered, skillsWanted: updated.skillsWanted } : prev)
-      setUser(prev => ({ ...prev, ...updated, id: prev.id }))
+      await api.put('/users/me', { bio, skillsOffered, skillsWanted })
+      // Re-fetch from server so display and edit state are always in sync with DB
+      const profileRes = await api.get(`/users/${id}`)
+      const fresh = profileRes.data as ProfileData
+      setProfile(fresh)
+      setBio(fresh.bio)
+      setSkillsOffered(fresh.skillsOffered ?? [])
+      setSkillsWanted(fresh.skillsWanted ?? [])
       setEditing(false)
     } catch {
       setError('Failed to save. Please try again.')
