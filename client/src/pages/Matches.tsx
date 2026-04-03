@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import api from '../services/api'
 import Navbar from '../components/Navbar'
 import { useAuthStore } from '../store/authStore'
+import { Link } from 'react-router-dom'
 
 interface Match {
   _id: string
@@ -73,7 +74,9 @@ export default function Matches() {
                 return (
                   <div key={m._id} className="bg-white rounded-xl p-4 shadow-sm border flex justify-between items-center">
                     <span className="font-medium">@{other.username}</span>
-                    <span className="text-green-500 text-sm font-semibold">Matched 🎉</span>
+                    <Link to={`/chat/${m._id}`} className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600">
+                    Chat 💬
+                    </Link>
                   </div>
                 )
               })}
