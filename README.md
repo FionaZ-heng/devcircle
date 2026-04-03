@@ -131,4 +131,4 @@ devcircle/
 
 **Fiona (Yutong) Zheng**  
 CS Student @ Northeastern University  
-[GitHub](https://github.com/FionaZ-heng) · [LinkedIn](https://linkedin.com/in/fiona-zheng-3a6a663a5)
+[GitHub](https://github.com/FionaZ-heng) · [LinkedIn](www.linkedin.com/in/yutong-fiona-zheng)
