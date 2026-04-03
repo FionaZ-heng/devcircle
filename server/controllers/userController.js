@@ -22,11 +22,13 @@ exports.getUser = async (req, res) => {
 exports.updateMe = async (req, res) => {
   try {
     const { bio, skillsOffered, skillsWanted } = req.body;
+    console.log('[updateMe] received:', { bio, skillsOffered, skillsWanted });
     const updated = await User.findByIdAndUpdate(
       req.user._id,
-      { bio, skillsOffered, skillsWanted },
-      { new: true, runValidators: true }
+      { $set: { bio: bio || '', skillsOffered: skillsOffered || [], skillsWanted: skillsWanted || [] } },
+      { new: true }
     ).select('-password');
+    console.log('[updateMe] saved:', { skillsOffered: updated.skillsOffered, skillsWanted: updated.skillsWanted });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });

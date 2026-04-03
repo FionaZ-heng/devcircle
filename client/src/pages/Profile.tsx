@@ -33,22 +33,27 @@ function Stars({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) {
   )
 }
 
+// inputValue/onInputChange are controlled by the parent so handleSave can
+// include any text the user typed but didn't press Enter on yet.
 function TagInput({
   label,
   tags,
+  inputValue,
+  onInputChange,
   onChange,
 }: {
   label: string
   tags: string[]
+  inputValue: string
+  onInputChange: (v: string) => void
   onChange: (tags: string[]) => void
 }) {
-  const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const add = () => {
-    const val = input.trim()
+    const val = inputValue.trim()
     if (val && !tags.includes(val)) onChange([...tags, val])
-    setInput('')
+    onInputChange('')
   }
 
   const remove = (tag: string) => onChange(tags.filter(t => t !== tag))
@@ -70,13 +75,21 @@ function TagInput({
           ref={inputRef}
           className="flex-1 min-w-[100px] text-sm outline-none bg-transparent"
           placeholder="Type and press Enter…"
-          value={input}
-          onChange={e => setInput(e.target.value)}
+          value={inputValue}
+          onChange={e => onInputChange(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
+          onBlur={add}
         />
       </div>
     </div>
   )
+}
+
+// Include any text pending in the TagInput that user hasn't pressed Enter on yet
+function withPending(tags: string[], pending: string): string[] {
+  const val = pending.trim()
+  if (val && !tags.includes(val)) return [...tags, val]
+  return tags
 }
 
 export default function Profile() {
@@ -90,6 +103,9 @@ export default function Profile() {
   const [bio, setBio] = useState('')
   const [skillsOffered, setSkillsOffered] = useState<string[]>([])
   const [skillsWanted, setSkillsWanted] = useState<string[]>([])
+  // Controlled input state — owned by parent so handleSave can flush pending text
+  const [offeredInput, setOfferedInput] = useState('')
+  const [wantedInput, setWantedInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -101,9 +117,9 @@ export default function Profile() {
       .then(res => {
         const data = res.data as ProfileData
         setProfile(data)
-        setBio(data.bio)
-        setSkillsOffered(data.skillsOffered)
-        setSkillsWanted(data.skillsWanted)
+        setBio(data.bio || '')
+        setSkillsOffered(data.skillsOffered || [])
+        setSkillsWanted(data.skillsWanted || [])
       })
       .catch(() => navigate('/'))
 
@@ -120,17 +136,25 @@ export default function Profile() {
     setSaving(true)
     setError('')
     try {
-      await api.put('/users/me', { bio, skillsOffered, skillsWanted })
+      // Flush any text pending in TagInput that user typed without pressing Enter
+      const finalOffered = withPending(skillsOffered, offeredInput)
+      const finalWanted = withPending(skillsWanted, wantedInput)
+
+      await api.put('/users/me', { bio, skillsOffered: finalOffered, skillsWanted: finalWanted })
+
       // Re-fetch from server so display and edit state are always in sync with DB
       const profileRes = await api.get(`/users/${id}`)
       const fresh = profileRes.data as ProfileData
       setProfile(fresh)
-      setBio(fresh.bio)
-      setSkillsOffered(fresh.skillsOffered ?? [])
-      setSkillsWanted(fresh.skillsWanted ?? [])
+      setBio(fresh.bio || '')
+      setSkillsOffered(fresh.skillsOffered || [])
+      setSkillsWanted(fresh.skillsWanted || [])
+      setOfferedInput('')
+      setWantedInput('')
       setEditing(false)
-    } catch {
-      setError('Failed to save. Please try again.')
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setError(msg || 'Failed to save. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -138,9 +162,11 @@ export default function Profile() {
 
   const handleCancel = () => {
     if (!profile) return
-    setBio(profile.bio)
-    setSkillsOffered(profile.skillsOffered)
-    setSkillsWanted(profile.skillsWanted)
+    setBio(profile.bio || '')
+    setSkillsOffered(profile.skillsOffered || [])
+    setSkillsWanted(profile.skillsWanted || [])
+    setOfferedInput('')
+    setWantedInput('')
     setEditing(false)
     setError('')
   }
@@ -202,7 +228,13 @@ export default function Profile() {
 
           {/* Skills Offered */}
           {editing ? (
-            <TagInput label="Skills I Offer" tags={skillsOffered} onChange={setSkillsOffered} />
+            <TagInput
+              label="Skills I Offer"
+              tags={skillsOffered}
+              inputValue={offeredInput}
+              onInputChange={setOfferedInput}
+              onChange={setSkillsOffered}
+            />
           ) : (
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Skills I Offer</p>
@@ -219,7 +251,13 @@ export default function Profile() {
 
           {/* Skills Wanted */}
           {editing ? (
-            <TagInput label="Skills I Want to Learn" tags={skillsWanted} onChange={setSkillsWanted} />
+            <TagInput
+              label="Skills I Want to Learn"
+              tags={skillsWanted}
+              inputValue={wantedInput}
+              onInputChange={setWantedInput}
+              onChange={setSkillsWanted}
+            />
           ) : (
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Skills I Want to Learn</p>
