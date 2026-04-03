@@ -4,6 +4,7 @@ interface User {
   id: string
   username: string
   email: string
+  avatar?: string
 }
 
 interface AuthStore {
@@ -11,6 +12,7 @@ interface AuthStore {
   token: string | null
   login: (user: User, token: string) => void
   logout: () => void
+  setUser: (updater: (prev: User) => User) => void
 }
 
 const savedUser = localStorage.getItem('user')
@@ -28,4 +30,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     localStorage.removeItem('user')
     set({ user: null, token: null })
   },
+  setUser: (updater) =>
+    set((state) => {
+      if (!state.user) return {}
+      const updated = updater(state.user)
+      localStorage.setItem('user', JSON.stringify(updated))
+      return { user: updated }
+    }),
 }))

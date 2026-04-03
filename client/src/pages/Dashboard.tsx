@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer, CartesianGrid } from 'recharts'
 import api from '../services/api'
 import Navbar from '../components/Navbar'
+import AvatarUpload from '../components/AvatarUpload'
 import { useAuthStore } from '../store/authStore'
 
 interface Stats {
@@ -21,7 +22,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) { navigate('/login'); return }
     api.get('/stats/me').then(res => setStats(res.data as Stats))
-    }, [user, navigate])
+  }, [user, navigate])
 
   if (!stats) return (
     <div className="min-h-screen bg-gray-50">
@@ -37,6 +38,19 @@ export default function Dashboard() {
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">My Dashboard 📊</h1>
+
+        {/* 用户信息 + 头像 */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border mb-8 flex items-center gap-6">
+          <AvatarUpload
+            currentAvatar={user?.avatar}
+            username={user?.username}
+          />
+          <div>
+            <p className="text-xl font-semibold">{user?.username}</p>
+            <p className="text-gray-400 text-sm">{user?.email}</p>
+            <p className="text-gray-400 text-xs mt-1">Click avatar to change photo</p>
+          </div>
+        </div>
 
         {/* 统计卡片 */}
         <div className="grid grid-cols-3 gap-4 mb-8">
