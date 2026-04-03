@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import CreateCard from './pages/CreateCard'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<div className="text-3xl font-bold text-center mt-20">DevCircle 🚀</div>} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/create" element={<CreateCard />} />
       </Routes>
     </BrowserRouter>
   )
