@@ -127,8 +127,7 @@ devcircle/
 
 ---
 
-## Author
+## 👩‍💻 Author
 
 **Fiona (Yutong) Zheng**  
-CS Student @ Northeastern University  
-[GitHub](https://github.com/FionaZ-heng) · [LinkedIn](www.linkedin.com/in/yutong-fiona-zheng)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/yutong-fiona-zheng)
