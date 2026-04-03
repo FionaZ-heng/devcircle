@@ -17,6 +17,7 @@ export default function Navbar() {
         {user ? (
           <>
             <Link to="/matches" className="text-gray-600 hover:text-blue-500 text-sm">Matches</Link>
+            <Link to="/dashboard" className="text-gray-600 hover:text-blue-500 text-sm">Dashboard</Link>
             <Link to="/create" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-semibold">
               + Post Card
             </Link>

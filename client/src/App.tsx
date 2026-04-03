@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import CreateCard from './pages/CreateCard'
 import Matches from './pages/Matches'
 import Chat from './pages/Chat'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/create" element={<CreateCard />} />
         <Route path="/matches" element={<Matches />} />
         <Route path="/chat/:matchId" element={<Chat />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
