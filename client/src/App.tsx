@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -6,10 +7,24 @@ import CreateCard from './pages/CreateCard'
 import Matches from './pages/Matches'
 import Chat from './pages/Chat'
 import Dashboard from './pages/Dashboard'
+import NotificationToast from './components/NotificationToast'
+import { useAuthStore } from './store/authStore'
+import { useSocketStore } from './store/socketStore'
 
-function App() {
+function AppInner() {
+  const { token } = useAuthStore()
+  const { connect, disconnect } = useSocketStore()
+
+  useEffect(() => {
+    if (token) {
+      connect(token)
+    } else {
+      disconnect()
+    }
+  }, [token, connect, disconnect])
+
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -19,6 +34,15 @@ function App() {
         <Route path="/chat/:matchId" element={<Chat />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
+      <NotificationToast />
+    </>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   )
 }

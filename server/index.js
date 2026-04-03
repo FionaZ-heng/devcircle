@@ -17,6 +17,8 @@ const io = new Server(server, {
   cors: { origin: 'https://devcircle-sigma.vercel.app', methods: ['GET', 'POST'] }
 });
 
+app.set('io', io);
+
 app.use(cors());
 app.use(express.json());
 
@@ -46,6 +48,9 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.userId);
+
+  // Join personal room for direct notifications
+  socket.join(socket.userId);
 
   socket.on('join_room', (matchId) => {
     socket.join(matchId);

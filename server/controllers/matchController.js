@@ -16,6 +16,17 @@ exports.requestMatch = async (req, res) => {
     if (existing) return res.status(400).json({ message: 'Match already exists' });
 
     const match = await Match.create({ requester: req.user._id, receiver: receiverId });
+
+    // Emit real-time notification to receiver via their personal room
+    const io = req.app.get('io');
+    if (io) {
+      io.to(receiverId).emit('match_request', {
+        matchId: match._id,
+        requesterName: req.user.username,
+        message: `${req.user.username} wants to match with you!`,
+      });
+    }
+
     res.status(201).json(match);
   } catch (err) {
     res.status(500).json({ message: err.message });
