@@ -14,7 +14,7 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: 'http://localhost:5173', methods: ['GET', 'POST'] }
+  cors: { origin: 'https://devcircle-sigma.vercel.app', methods: ['GET', 'POST'] }
 });
 
 app.use(cors());
@@ -25,6 +25,7 @@ app.use('/api/cards', require('./routes/cardRoutes'));
 app.use('/api/matches', require('./routes/matchRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'DevCircle API is running 🚀' });
