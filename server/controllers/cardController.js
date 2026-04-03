@@ -2,12 +2,9 @@ const jwt = require('jsonwebtoken');
 const SkillCard = require('../models/SkillCard');
 const User = require('../models/User');
 
-// Tokenize a free-text string into lowercase keywords (≥3 chars).
-function tokenize(text = '') {
-  return text.toLowerCase().split(/[\s,/+&()\-]+/).filter(w => w.length >= 3);
-}
-
-// Compute match score using both profile skills AND card content (tags/text).
+// Compute match score using profile skills AND card content.
+// Uses substring matching on free-text fields so "React.js", "React development"
+// all match a skill term of "React".
 // +2 per term: owner can teach something I want to learn
 // +1 per term: owner wants to learn something I can teach
 function computeMatchScore(card, myWanted = [], myOffered = []) {
@@ -15,22 +12,29 @@ function computeMatchScore(card, myWanted = [], myOffered = []) {
 
   const norm = s => s.toLowerCase().trim();
 
-  // Owner's "offered" signals: profile skills + card tags + card offering keywords
-  const offerSet = new Set([
-    ...(card.userId?.skillsOffered || []).map(norm),
-    ...(card.tags || []).map(norm),
-    ...tokenize(card.offering),
-  ]);
+  // Exact-match sets for structured fields (profile skills, tags)
+  const ownerOfferedExact = new Set((card.userId?.skillsOffered || []).map(norm));
+  const ownerTagsExact    = new Set((card.tags || []).map(norm));
+  const ownerWantedExact  = new Set((card.userId?.skillsWanted || []).map(norm));
 
-  // Owner's "wanted" signals: profile skills + card wanting keywords
-  const wantSet = new Set([
-    ...(card.userId?.skillsWanted || []).map(norm),
-    ...tokenize(card.wanting),
-  ]);
+  // Full lowercased text for substring matching
+  const offeringText = norm(card.offering || '');
+  const wantingText  = norm(card.wanting  || '');
 
   let score = 0;
-  for (const s of myWanted)  { if (offerSet.has(norm(s))) score += 2; }
-  for (const s of myOffered) { if (wantSet.has(norm(s)))  score += 1; }
+  for (const skill of myWanted.map(norm)) {
+    if (
+      ownerOfferedExact.has(skill) ||   // profile skill exact match
+      ownerTagsExact.has(skill)    ||   // card tag exact match
+      offeringText.includes(skill)      // offering text substring match
+    ) score += 2;
+  }
+  for (const skill of myOffered.map(norm)) {
+    if (
+      ownerWantedExact.has(skill) ||    // profile skill exact match
+      wantingText.includes(skill)       // wanting text substring match
+    ) score += 1;
+  }
   return score;
 }
 
@@ -67,11 +71,11 @@ exports.getCards = async (req, res) => {
           myOffered = me.skillsOffered || [];
           myId = decoded.id;
 
-          // Fallback: if profile skills not set, derive from the user's own cards
+          // Fallback: if profile skills not set, derive keywords from the user's own cards
           if (!myWanted.length && !myOffered.length) {
             const myCards = await SkillCard.find({ userId: decoded.id });
-            myOffered = [...new Set(myCards.flatMap(c => [...(c.tags || []), ...tokenize(c.offering)]))];
-            myWanted  = [...new Set(myCards.flatMap(c => tokenize(c.wanting)))];
+            myOffered = [...new Set(myCards.flatMap(c => c.tags || []))];
+            myWanted  = myCards.map(c => c.wanting).filter(Boolean);
           }
         }
       } catch { /* unauthenticated — skip scoring */ }
