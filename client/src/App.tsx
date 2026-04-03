@@ -7,6 +7,7 @@ import CreateCard from './pages/CreateCard'
 import Matches from './pages/Matches'
 import Chat from './pages/Chat'
 import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
 import NotificationToast from './components/NotificationToast'
 import { useAuthStore } from './store/authStore'
 import { useSocketStore } from './store/socketStore'
@@ -33,6 +34,7 @@ function AppInner() {
         <Route path="/matches" element={<Matches />} />
         <Route path="/chat/:matchId" element={<Chat />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile/:id" element={<Profile />} />
       </Routes>
       <NotificationToast />
     </>

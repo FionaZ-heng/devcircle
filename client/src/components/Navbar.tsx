@@ -23,7 +23,12 @@ export default function Navbar() {
               + Post Card
             </Link>
             <NotificationBell />
-            <span className="text-gray-600 text-sm">Hi, {user.username}</span>
+            <Link to={`/profile/${user.id}`} className="text-gray-600 hover:text-blue-500 text-sm">
+              {user.avatar
+                ? <img src={user.avatar} alt={user.username} className="w-7 h-7 rounded-full object-cover inline" />
+                : <span>Hi, {user.username}</span>
+              }
+            </Link>
             <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 text-sm">
               Logout
             </button>

@@ -28,6 +28,7 @@ app.use('/api/matches', require('./routes/matchRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'DevCircle API is running 🚀' });
