@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSocketStore, MatchNotification } from '../store/socketStore'
+import { useSocketStore } from '../store/socketStore'
+import type { MatchNotification } from '../store/socketStore'
 
 function ToastItem({ notification }: { notification: MatchNotification }) {
   const navigate = useNavigate()

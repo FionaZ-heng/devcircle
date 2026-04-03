@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { io, Socket } from 'socket.io-client'
+import { io } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 import api from '../services/api'
 import Navbar from '../components/Navbar'
 import { useAuthStore } from '../store/authStore'
