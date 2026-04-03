@@ -14,6 +14,25 @@ interface ProfileData {
   matchCount: number
 }
 
+interface Review {
+  _id: string
+  reviewer: { _id: string; username: string; avatar: string }
+  rating: number
+  comment: string
+  createdAt: string
+}
+
+function Stars({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) {
+  const cls = size === 'lg' ? 'text-2xl' : 'text-base'
+  return (
+    <span className={cls}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <span key={n} style={{ color: n <= Math.round(value) ? '#f59e0b' : '#d1d5db' }}>★</span>
+      ))}
+    </span>
+  )
+}
+
 function TagInput({
   label,
   tags,
@@ -66,6 +85,7 @@ export default function Profile() {
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [editing, setEditing] = useState(false)
   const [bio, setBio] = useState('')
   const [skillsOffered, setSkillsOffered] = useState<string[]>([])
@@ -86,7 +106,15 @@ export default function Profile() {
         setSkillsWanted(data.skillsWanted)
       })
       .catch(() => navigate('/'))
+
+    api.get(`/reviews/${id}`)
+      .then(res => setReviews(res.data as Review[]))
+      .catch(() => {})
   }, [id, navigate])
+
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : null
 
   const handleSave = async () => {
     setSaving(true)
@@ -95,7 +123,6 @@ export default function Profile() {
       const res = await api.put('/users/me', { bio, skillsOffered, skillsWanted })
       const updated = res.data as ProfileData
       setProfile(prev => prev ? { ...prev, bio: updated.bio, skillsOffered: updated.skillsOffered, skillsWanted: updated.skillsWanted } : prev)
-      // Sync authStore so Navbar avatar etc stay fresh
       setUser(prev => ({ ...prev, ...updated, id: prev.id }))
       setEditing(false)
     } catch {
@@ -139,6 +166,12 @@ export default function Profile() {
           )}
           <h1 className="text-2xl font-bold mt-4 text-gray-800">@{profile.username}</h1>
           <p className="text-sm text-gray-400 mt-1">{profile.matchCount} successful match{profile.matchCount !== 1 ? 'es' : ''}</p>
+          {avgRating !== null && (
+            <div className="flex items-center gap-2 mt-2">
+              <Stars value={avgRating} size="lg" />
+              <span className="text-sm text-gray-500">{avgRating.toFixed(1)} ({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+            </div>
+          )}
         </div>
 
         {/* Profile card */}
@@ -228,6 +261,39 @@ export default function Profile() {
             </div>
           )}
         </div>
+
+        {/* Reviews */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-3">
+            Reviews {reviews.length > 0 && <span className="text-gray-400 font-normal text-sm">({reviews.length})</span>}
+          </h2>
+          {reviews.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6 bg-white rounded-2xl border shadow-sm">No reviews yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {reviews.map(r => (
+                <div key={r._id} className="bg-white rounded-2xl border shadow-sm p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {r.reviewer.avatar ? (
+                        <img src={r.reviewer.avatar} alt={r.reviewer.username} className="w-7 h-7 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-500">
+                          {r.reviewer.username[0].toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-gray-700">@{r.reviewer.username}</span>
+                    </div>
+                    <Stars value={r.rating} />
+                  </div>
+                  {r.comment && <p className="text-sm text-gray-600">{r.comment}</p>}
+                  <p className="text-xs text-gray-300 mt-2">{new Date(r.createdAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   )
