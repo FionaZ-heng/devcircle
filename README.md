@@ -2,6 +2,8 @@
 
 > A skill-exchange platform for developers — teach what you know, learn what you want.
 
+🌐 **Live Demo:** https://devcircle-sigma.vercel.app
+
 ## Overview
 
 DevCircle connects developers who want to exchange skills. Post a card saying "I can teach React, I want to learn Docker," get matched with someone who complements your skills, and chat in real time.
