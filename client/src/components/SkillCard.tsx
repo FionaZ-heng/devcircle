@@ -12,9 +12,10 @@ interface Props {
     tags: string[]
     userId: { _id: string, username: string }
   }
+  matchScore?: number
 }
 
-export default function SkillCard({ card }: Props) {
+export default function SkillCard({ card, matchScore = 0 }: Props) {
   const { user } = useAuthStore()
   const [requested, setRequested] = useState(false)
   const [msg, setMsg] = useState('')
@@ -33,6 +34,11 @@ export default function SkillCard({ card }: Props) {
     <div className="bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition">
       <div className="flex justify-between items-start mb-3">
         <span className="text-xs text-gray-400">@{card.userId?.username}</span>
+        {matchScore >= 2 && (
+          <span className="text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full">
+            🎯 Great Match
+          </span>
+        )}
       </div>
       <div className="mb-3">
         <span className="text-xs font-semibold text-green-600 uppercase">Offering</span>

@@ -11,6 +11,7 @@ interface Card {
   description: string
   tags: string[]
   userId: { _id: string, username: string }
+  matchScore?: number
 }
 
 export default function Home() {
@@ -49,7 +50,9 @@ export default function Home() {
           <p className="text-center text-gray-400">No cards yet. Be the first to post one!</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cards.map((card) => <SkillCard key={card._id} card={card} />)}
+            {cards.map((card) => (
+              <SkillCard key={card._id} card={card} matchScore={card.matchScore} />
+            ))}
           </div>
         )}
       </div>
