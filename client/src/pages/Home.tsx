@@ -1,19 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react'
 import api from '../services/api'
 import Navbar from '../components/Navbar'
 import SkillCard from '../components/SkillCard'
 
+interface Card {
+  _id: string
+  offering: string
+  wanting: string
+  description: string
+  tags: string[]
+  userId: { _id: string, username: string }
+}
+
 export default function Home() {
-  const [cards, setCards] = useState([])
+  const [cards, setCards] = useState<Card[]>([])
   const [search, setSearch] = useState('')
 
   const fetchCards = async (q = '') => {
     const res = await api.get(`/cards${q ? `?search=${q}` : ''}`)
-    setCards(res.data)
+    setCards(res.data as Card[])
   }
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchCards() }, [])
 
   return (
@@ -41,7 +49,7 @@ export default function Home() {
           <p className="text-center text-gray-400">No cards yet. Be the first to post one!</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cards.map((card: any) => <SkillCard key={card._id} card={card} />)}
+            {cards.map((card) => <SkillCard key={card._id} card={card} />)}
           </div>
         )}
       </div>

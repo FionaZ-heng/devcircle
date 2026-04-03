@@ -19,7 +19,7 @@ export default function Matches() {
 
   const fetchMatches = async () => {
     const res = await api.get('/matches')
-    setMatches(res.data)
+    setMatches(res.data as Match[])
   }
 
   useEffect(() => { fetchMatches() }, [])

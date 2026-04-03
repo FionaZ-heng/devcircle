@@ -20,8 +20,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!user) { navigate('/login'); return }
-    api.get('/stats/me').then(res => setStats(res.data))
-  }, [])
+    api.get('/stats/me').then(res => setStats(res.data as Stats))
+    }, [user, navigate])
 
   if (!stats) return (
     <div className="min-h-screen bg-gray-50">

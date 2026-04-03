@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { io, Socket } from 'socket.io-client'
@@ -23,7 +24,7 @@ export default function Chat() {
 
   useEffect(() => {
     // 连接 socket
-    socket = io('http://localhost:3001', { auth: { token } })
+    socket = io('https://devcircle-production.up.railway.app', { auth: { token } })
     socket.emit('join_room', matchId)
 
     // 接收新消息
@@ -32,7 +33,7 @@ export default function Chat() {
     })
 
     // 加载历史消息
-    api.get(`/messages/${matchId}`).then(res => setMessages(res.data))
+    api.get(`/messages/${matchId}`).then((res: any) => setMessages(res.data))
 
     return () => { socket.disconnect() }
   }, [matchId])

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../services/api'
@@ -12,8 +13,9 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await api.post('/auth/login', form)
-      login(res.data.user, res.data.token)
+      const res = await api.post<{ user: any; token: string }>('/auth/login', form)
+      const { user, token } = res.data
+      login(user, token)
       navigate('/')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
